@@ -12,7 +12,7 @@ const verifyToken = (req, res, next) => {
         });
     }
     else{
-        return res.status(401).json("You are not authenticated")
+        return res.status(401).json("You are not authenticated.")
     }
 };
 
@@ -22,7 +22,7 @@ const verifyTokenAndAuthorization = (req, res, next) => {
             next();
         }
         else{
-            res.status(403).json("You are not allowed to make changes");
+            res.status(403).json("You are not the authorized user.");
         }
     });
 };
@@ -32,7 +32,7 @@ const verifyTokenAndAdmin = (req, res, next) => {
       if (req.customer.isAdmin) {
         next();
       } else {
-        res.status(403).json("You are not allowed to make changes");
+        res.status(403).json("You do not have admin privileges. Please login as an admin.");
       }
     });
   };

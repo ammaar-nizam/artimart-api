@@ -1,4 +1,5 @@
 const Customer = require("../models/Customer");
+const CryptoJS = require("crypto-js");
 const { verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin } = require("./verifyToken");
 
 const router = require("express").Router();
@@ -9,6 +10,23 @@ router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
     const customer = await Customer.findById(req.params.id);
     const { password, ...others } = customer._doc;
     res.status(200).json(others);
+    } catch (error) {
+    res.status(500).json(error);
+    }
+});
+
+// Get Customer By Name
+router.get("/find/:username", verifyTokenAndAdmin, async (req, res) => {
+    try {
+    let customer = await Customer.find(
+        { 
+            "$or": [
+                {customerName: {$regex:req.params.username}}
+            ]  
+        }
+    );
+    const { password, ...others } = customer._doc;
+    res.status(200).json(customer);
     } catch (error) {
     res.status(500).json(error);
     }
