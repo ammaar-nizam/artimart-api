@@ -19,7 +19,7 @@ const cors = require("cors");
 dotenv.config();
 
 mongoose
-  .connect("mongodb+srv://ammaarnizam:YHKntPIFP91baD1K@cluster0.3ete8ds.mongodb.net/artimart")
+  .connect(process.env.MONGO_URL)
   .then(() => console.log("DB Connection Successfull!"))
   .catch((error) => {
     console.log(error);
