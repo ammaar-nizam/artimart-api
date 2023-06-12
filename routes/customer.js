@@ -16,7 +16,7 @@ router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
 });
 
 // Get Customer By Name
-router.get("/find/:username", verifyTokenAndAdmin, async (req, res) => {
+router.get("/find/:username", verifyToken, async (req, res) => {
     try {
     let customer = await Customer.find(
         { 
@@ -33,7 +33,7 @@ router.get("/find/:username", verifyTokenAndAdmin, async (req, res) => {
 });
 
 // Get all Customers
-router.get("/", verifyTokenAndAdmin, async (req, res) => {
+router.get("/", async (req, res) => {
     const query = req.query.new;
     try {
     const customers = query
@@ -69,6 +69,34 @@ router.get("/stats", verifyTokenAndAdmin, async (req, res) => {
     } catch (error) {
     res.status(500).json(error);
     }
+});
+
+// Create User
+router.post("/register", async (req, res) => {
+    const newCustomer = new Customer({
+        customerFirstName: req.body.customerFirstName,
+        customerLastName: req.body.customerLastName,
+        email: req.body.email,
+        password: CryptoJS.AES.encrypt(req.body.password, process.env.PASSWORD_SECRET_KEY).toString(),
+        isAdmin: req.body.isAdmin,
+        userRole: req.body.userRole,
+        age: req.body.age,
+        phone: req.body.phone,
+        gender: req.body.gender,
+        house: req.body.house,
+        addressLine1: req.body.addressLine1,
+        addressLine2: req.body.addressLine2,
+        city: req.body.city,
+        zipCode: req.body.zipCode,
+    });
+
+    try{
+        const savedCustomer = await newCustomer.save();
+        res.status(201).json(savedCustomer);
+    }catch(error){
+        res.status(500).json(error);
+    }
+
 });
 
 // Update a Customer By Id
