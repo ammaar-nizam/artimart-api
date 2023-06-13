@@ -15,6 +15,9 @@ const cartRoute = require("./routes/cart");
 const orderRoute = require("./routes/order");
 const stripeRoute = require("./routes/stripe");
 const cors = require("cors");
+const bodyParser = require('body-parser');
+const multer = require('multer');
+const uploadImage = require('./helpers/helpers');
 
 dotenv.config();
 
@@ -24,6 +27,42 @@ mongoose
   .catch((error) => {
     console.log(error);
   });
+
+const multerMid = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
+
+app.disable('x-powered-by')
+app.use(multerMid.single('file'))
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: false}))
+
+app.post('/uploads', async (req, res, next) => {
+  try {
+    const myFile = req.file
+    const imageUrl = await uploadImage(myFile)
+
+    res
+      .status(200)
+      .json({
+        message: "Upload was successful",
+        data: imageUrl
+      })
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.use((err, req, res, next) => {
+  res.status(500).json({
+    error: err,
+    message: 'Internal server error!',
+  })
+  next()
+})
 
 app.use(cors());
 app.use(express.json());
@@ -39,8 +78,8 @@ app.use("/api/shippings", shippingRoute);
 app.use("/api/carts", cartRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/checkout", stripeRoute);
-app.use('/uploads', express.static('uploads'));
-app.use('/uploads/featured-images', express.static('uploads/featured-images'));
+// app.use('/uploads', express.static('uploads'));
+// app.use('/uploads/featured-images', express.static('uploads/featured-images'));
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Backend server is running!");

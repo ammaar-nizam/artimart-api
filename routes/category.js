@@ -2,31 +2,31 @@ const Category = require("../models/Category");
 const { verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin } = require("./verifyToken");
 const multer = require("multer");
 
-const storage = multer.diskStorage({
-  destination: function(req, file, callback) {
-    callback(null, './uploads/featured-images/');
-  },
-  filename: function(req, file, callback) {
-    callback(null, file.originalname);
-  }
-});
+// const storage = multer.diskStorage({
+//   destination: function(req, file, callback) {
+//     callback(null, './uploads/featured-images/');
+//   },
+//   filename: function(req, file, callback) {
+//     callback(null, file.originalname);
+//   }
+// });
 
-const fileFilter = (req, file, callback) => {
-  // reject a file
-  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-    callback(null, true);
-  } else {
-    callback(null, false);
-  }
-};
+// const fileFilter = (req, file, callback) => {
+//   // reject a file
+//   if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+//     callback(null, true);
+//   } else {
+//     callback(null, false);
+//   }
+// };
 
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 1024 * 1024 * 5
-  },
-  fileFilter: fileFilter
-});
+// const upload = multer({
+//   storage: storage,
+//   limits: {
+//     fileSize: 1024 * 1024 * 5
+//   },
+//   fileFilter: fileFilter
+// });
 
 const router = require("express").Router();
 
