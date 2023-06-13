@@ -15,9 +15,15 @@ const cartRoute = require("./routes/cart");
 const orderRoute = require("./routes/order");
 const stripeRoute = require("./routes/stripe");
 const cors = require("cors");
-const bodyParser = require('body-parser');
-const multer = require('multer');
-const uploadImage = require('./helpers/helpers');
+const { Storage } = require("@google-cloud/storage");
+const Multer = require("multer");
+const path = require('path')
+const src = path.join(__dirname, "images");
+
+const util = require('util')
+const { format } = util
+
+app.use(express.static(src));
 
 dotenv.config();
 
@@ -28,41 +34,61 @@ mongoose
     console.log(error);
   });
 
-const multerMid = multer({
-  storage: multer.memoryStorage(),
+const multer = Multer({
+  storage: Multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024,
+    fileSize: 5 * 1024 * 1024
   },
 });
 
-app.disable('x-powered-by')
-app.use(multerMid.single('file'))
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: false}))
+const storage = new Storage({
+  keyFilename: "artimart-image-storage-5ab3b6b7b224.json",
+  projectId: 'artimart-image-storage',
+})
 
-app.post('/uploads', async (req, res, next) => {
+const bucket = storage.bucket("artimart-images-bucket");
+
+app.post("/uploads", multer.single("file"), (req, res) => {
+  console.log("Made it /upload");
   try {
-    const myFile = req.file
-    const imageUrl = await uploadImage(myFile)
+    if (req.file) {
+      console.log("File found, trying to upload...");
+      const blob = bucket.file(req.file.originalname);
+      const blobStream = blob.createWriteStream();
 
-    res
-      .status(200)
-      .json({
-        message: "Upload was successful",
-        data: imageUrl
-      })
+      blobStream.on("finish", () => {
+        res.status(200).send("Success");
+        console.log("Success");
+      });
+      blobStream.end(req.file.buffer);
+    } else throw "error with img";
   } catch (error) {
-    next(error)
+    res.status(500).send(error);
   }
-})
+});
 
-app.use((err, req, res, next) => {
-  res.status(500).json({
-    error: err,
-    message: 'Internal server error!',
-  })
-  next()
-})
+// app.post('/uploads', async (req, res, next) => {
+//   try {
+//     const myFile = req.file
+//     const imageUrl = await uploadImage(myFile)
+//     res
+//     .status(200)
+//     .json({
+//       message: "Upload was successful",
+//       data: imageUrl
+//     })
+//   } catch (error) {
+//     next(error)
+//   }
+// })
+
+// app.use((err, req, res, next) => {
+//   res.status(500).json({
+//     error: err,
+//     message: 'Internal server error!',
+//   })
+//   next();
+// })
 
 app.use(cors());
 app.use(express.json());
