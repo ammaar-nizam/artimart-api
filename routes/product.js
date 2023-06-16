@@ -66,7 +66,15 @@ router.get("/", async (req, res) => {
     }
 });
 
-
+// Get Product Statistics
+router.get("/stats", async (req, res) => {
+  try {
+      const productData = await Product.find().count();
+  res.status(200).json(productData)
+  } catch (error) {
+  res.status(500).json(error);
+  }
+});
 
 // Create a Product
 router.post("/", verifyTokenAndAdmin, async (req, res) => {

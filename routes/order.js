@@ -22,6 +22,16 @@ router.get("/", verifyTokenAndAdmin, async (req, res) => {
       res.status(500).json(error);
     }
 }); 
+
+// Get Total Order Count
+router.get("/stats", async (req, res) => {
+  try {
+      const orderData = await Order.find().count();
+  res.status(200).json(orderData)
+  } catch (error) {
+  res.status(500).json(error);
+  }
+});
   
 // Get Monthly Income
 router.get("/income", verifyTokenAndAdmin, async (req, res) => {
