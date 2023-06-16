@@ -46,26 +46,10 @@ router.get("/", async (req, res) => {
 });
 
 // Get Customer Statistics
-router.get("/stats", verifyTokenAndAdmin, async (req, res) => {
-    const date = new Date();
-    const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
-
+router.get("/stats", async (req, res) => {
     try {
-    const data = await Customer.aggregate([
-        { $match: { createdAt: { $gte: lastYear } } },
-        {
-        $project: {
-            month: { $month: "$createdAt" },
-        },
-        },
-        {
-        $group: {
-            _id: "$month",
-            total: { $sum: 1 },
-        },
-        },
-    ]);
-    res.status(200).json(data)
+        const customerData = await Customer.find().count();
+    res.status(200).json(customerData)
     } catch (error) {
     res.status(500).json(error);
     }
@@ -129,5 +113,8 @@ router.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
     res.status(500).json(error);
     }
 });
+
+// Count available customers
+router.get("/")
 
 module.exports = router
