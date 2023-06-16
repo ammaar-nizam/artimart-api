@@ -14,6 +14,7 @@ const shippingRoute = require("./routes/shipping");
 const cartRoute = require("./routes/cart");
 const orderRoute = require("./routes/order");
 const stripeRoute = require("./routes/stripe");
+const commonRoute = require("./routes/commonRoute");
 const cors = require("cors");
 const { Storage } = require("@google-cloud/storage");
 const Multer = require("multer");
@@ -104,6 +105,7 @@ app.use("/api/shippings", shippingRoute);
 app.use("/api/carts", cartRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/checkout", stripeRoute);
+app.use("/api", commonRoute);
 // app.use('/uploads', express.static('uploads'));
 // app.use('/uploads/featured-images', express.static('uploads/featured-images'));
 
