@@ -77,7 +77,7 @@ router.get("/stats", async (req, res) => {
 });
 
 // Create a Product
-router.post("/", verifyTokenAndAdmin, async (req, res) => {
+router.post("/", async (req, res) => {
   
   const newProduct = new Product({
 
